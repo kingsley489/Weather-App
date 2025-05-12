@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learny Weather • Results</title>
+  
+  <!-- fonts & your gradient text example -->
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" 
+    rel="stylesheet"
+  />
+  
+  <style>
+    :root {
+      --bg: #121217;
+      --card-bg: #1e1f27;
+      --fg: #ececf1;
+      --muted: #888;
+      --gradient-start: rgba(137,137,137,1) 29%;
+      --gradient-end: rgba(103,103,103,1) 72%;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.4;
+    }
+    h1, h2, .gradient-text {
+      font-family: 'Geist', sans-serif;
+    }
+    .gradient-text {
+      background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .container {
+      max-width: 1000px;
+      padding: 1rem;
+      margin: auto;
+    }
+  /* Add to your existing styles */
+.search-bar {
+  width: 100%;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;       /* or whatever max you prefer */
+  background: #1e1f27;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+}
+
+.search-container img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.search-container img:hover {
+  opacity: 1;
+}
+
+.search-container input {
+  flex: 1;
+  margin: 0 0.5rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+}
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .flex {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .flex .card {
+      flex: 1 1 300px;
+    }
+    .current-card {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      min-height: 200px;
+    }
+    .current-card img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+    }
+    .current-content {
+      position: relative;
+      z-index: 1;
+    }
+    .current-content h1 {
+      font-size: 3rem; margin-bottom: 0.2rem;
+    }
+    .current-content small {
+      color: var(--muted);
+    }
+    .stats-card {
+      text-align: center;
+    }
+    .stats-card .temp {
+      font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 500;
+    }
+    .stats-list {
+      list-style: none;
+    }
+    .stats-list li {
+      font-size: 0.9rem; color: var(--muted);
+      display: flex; justify-content: space-between;
+      margin: 0.3rem 0;
+    }
+    .sparkline {
+      /* hook your chart here */
+      height: 100px;
+      background: linear-gradient(to right, #444, #222);
+      border-radius: 8px;
+      position: relative;
+    }
+    .sparkline span {
+      position: absolute; top: 0.5rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9rem;
+    }
+    .forecast {
+      display: flex; gap: 0.5rem; overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .forecast .day {
+      min-width: 130px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .forecast .day h3 {
+      font-size: 1rem; margin-bottom: 0.5rem;
+    }
+    .forecast .day img {
+      width: 70px; height: 70px;
+      margin-bottom: 0.3rem;
+    }
+    .map-container {
+      width: 100%; height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    @media (max-width: 600px) {
+      .current-content h1 { font-size: 2rem; }
+      .stats-card .temp { font-size: 2rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- search bar to go back -->
+   <!-- Weather Page Search Bar -->
+<div class="search-bar">
+    <div class="search-container">
+      <!-- left “search” icon -->
+      <img src="assets/search.svg" alt="Search" id="searchIcon" />
+  
+      <!-- text input -->
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search again..."
+        autocomplete="off"
+      />
+  
+      <!-- right “voice” icon -->
+      <img src="assets/Icon.svg" alt="Voice Search" id="voiceSearch" />
+    </div>
+  </div>
+  
+
+    <!-- Current weather + stats -->
+    <div class="flex">
+      <div class="card current-card">
+        <img src="assets/img.png" alt="weather-bg"/>
+        <div class="current-content">
+          <small>Results for Lagos 101245, Lagos</small>
+          <h1 class="gradient-text">14:00 PM</h1>
+          <small>Tuesday, July 11 2025</small>
+          <p style="margin-top:1rem; font-size:0.8rem; color:#ccc;">
+            The sky’s feeling a little bit of both today.
+          </p>
+        </div>
+      </div>
+
+      <div class="card stats-card">
+        <div class="temp">32° C</div>
+        <div>Mostly Cloudy</div>
+        <ul class="stats-list">
+          <li><span>Precipitation</span><span>0%</span></li>
+          <li><span>Humidity</span><span>68%</span></li>
+          <li><span>Wind</span><span>13 Km/H</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sparkline / chart placeholder -->
+    <div class="card">
+      <div class="sparkline">
+        <!-- you can inject a chart here -->
+        <!-- <span>32  32  32  32  32</span> -->
+      </div>
+    </div>
+
+    <!-- 7-day forecast -->
+    <h2 style="margin-bottom:0.5rem; color:var(--muted)">Forecast</h2>
+    <div class="forecast">
+      <!-- repeat .day for each day -->
+      <div class="day">
+        <h3>Sun</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Mon</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Tue</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Wed</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Thu</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Fri</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <div class="day">
+        <h3>Sat</h3>
+        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <div>32°<sup>C</sup></div>
+        <div style="opacity:0.6;">26°<sup>C</sup></div>
+      </div>
+      <!-- … Tue, Wed, Thu, Fri similarly -->
+    </div>
+
+    <!-- Map embed -->
+    <h2 style="margin-top:2rem; margin-bottom:0.5rem; color:var(--muted)">Map</h2>
+    <div class="map-container">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!…"
+        width="100%" height="100%" style="border:0;"
+        allowfullscreen="" loading="lazy">
+      </iframe>
+    </div>
+  </div>
+</body>
+</html>

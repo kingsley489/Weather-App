@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather App - Location Search</title>
+  <!-- Import custom fonts -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100;300;500;700;900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+    /* Reset and base styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #0f0f13;
+      color: #ccc;
+      font-family: 'Inter', Arial, sans-serif;
+      padding: 1rem;
+    }
+    h1 {
+      font-family: 'Geist', sans-serif;
+      font-size: 3rem;
+      font-weight: 300;
+      margin-bottom: 1rem;
+      text-align: center;
+      /* Gradient text */
+      background: linear-gradient(
+        to bottom,
+        rgba(137,137,137,1) 29%,
+        rgba(103,103,103,1) 72%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .container {
+      width: 100%;
+      max-width: 550px;
+      padding: 1rem;
+    }
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 3rem 0.75rem 2.5rem;
+      border-radius: 9999px;
+      border: 1px solid #A9A9A9;
+      background: transparent;
+      color: #eee;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .search-input:focus {
+      border-color: #A9A9A9;
+    }
+    /* Icon placeholders */
+    .search-icon, .mic-icon {
+      position: absolute;
+      width: 1.5rem;
+      height: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .search-icon { left: 1rem; }
+    .mic-icon { right: 1rem; cursor: pointer; }
+    /* Suggestions dropdown */
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 0.25rem);
+      left: 0;
+      width: 100%;
+      background: #1a1a1f;
+      border: 1px solid #444;
+      border-radius: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 10;
+    }
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .suggestion-item:hover {
+      background: #2a2a2f;
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 1.5rem; }
+      .search-input {
+        font-size: 0.9rem;
+        padding: 0.6rem 2.5rem 0.6rem 2rem;
+      }
+      .search-icon, .mic-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Location?</h1>
+    <div class="search-wrapper">
+      <img src="assets/search.svg" alt="Search" class="search-icon">
+      <input type="text" placeholder="Search..." class="search-input" autocomplete="off" id="searchInput">
+      <img src="assets/Icon.svg" alt="Voice" class="mic-icon" id="voiceSearch">
+      <div class="suggestions" id="suggestionsList"></div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const suggestionsContainer = document.getElementById('suggestionsContainer');
+      const voiceBtn = document.getElementById('voiceSearch');
+    
+      // Example data – replace with your real list
+      const allLocations = [
+        'New York', 'London', 'Paris', 'Tokyo',
+        'Sydney', 'Berlin', 'Toronto', 'Mumbai',
+        'Lagos', 'Abia'
+      ];
+    
+      // Redirect helper
+      function goToResults(query) {
+        const q = encodeURIComponent(query.trim());
+        if (!q) return;
+        window.location.href = `weather.html?loc=${q}`;
+      }
+    
+      // Render suggestion list
+      function showSuggestions(list) {
+        suggestionsContainer.innerHTML = '';
+        list.forEach(text => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          li.classList.add('suggestion-item');
+          // use mousedown to beat blur()
+          li.addEventListener('mousedown', () => {
+            goToResults(text);
+          });
+          suggestionsContainer.appendChild(li);
+        });
+      }
+    
+      // Filter as you type
+      searchInput.addEventListener('input', () => {
+        const val = searchInput.value.trim().toLowerCase();
+        if (!val) {
+          suggestionsContainer.innerHTML = '';
+          return;
+        }
+        const filtered = allLocations.filter(loc =>
+          loc.toLowerCase().startsWith(val)
+        );
+        showSuggestions(filtered);
+      });
+    
+      // Clear suggestions shortly after blur
+      searchInput.addEventListener('blur', () => {
+        setTimeout(() => { suggestionsContainer.innerHTML = ''; }, 100);
+      });
+    
+      // Handle Enter key press
+      searchInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          goToResults(searchInput.value);
+        }
+      });
+    
+      // Voice recognition setup
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+    
+        voiceBtn.addEventListener('click', () => {
+          recognition.start();
+          voiceBtn.classList.add('listening');
+        });
+    
+        recognition.addEventListener('result', e => {
+          const transcript = e.results[0][0].transcript;
+          searchInput.value = transcript;
+          // trigger suggestion/filter and redirect
+          const ev = new Event('input', { bubbles: true });
+          searchInput.dispatchEvent(ev);
+          goToResults(transcript);
+        });
+    
+        recognition.addEventListener('end', () => {
+          voiceBtn.classList.remove('listening');
+        });
+    
+        recognition.addEventListener('error', err => {
+          console.error('Speech recognition error:', err.error);
+          voiceBtn.classList.remove('listening');
+        });
+      } else {
+        console.warn('Speech Recognition API not supported.');
+        voiceBtn.style.opacity = 0.5;
+      }
+    });
+    </script>
+    
+    
+</body>
+</html>
