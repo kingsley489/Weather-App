@@ -312,7 +312,8 @@
   <script>
 
     const urlParams = new URLSearchParams(window.location.search);
-const city = urlParams.get('city') || 'Lagos';
+    const city = urlParams.get('loc') || 'Lagos';
+
 
 
 document.getElementById('searchInput').value = city;
@@ -472,17 +473,19 @@ document.getElementById('searchIcon').addEventListener('click', function() {
     // Replace 'Clouds' below with actual condition fetched from your API
     updateQuote('Clouds');
 
-    async function fetchWeather(city) {
+   async function fetchWeather(city) {
   try {
-    const apiKey = '5d28878eec0c443d991154058252205'; // Replace with your WeatherAPI key
-    const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=YOUR_API_KEY&q=${city}&days=7&aqi=no&alerts=no`)
-  .then(res => res.json())
-  .then(data => {
-    // Use data.location, data.current, data.forecast, etc. to update the UI
-  });
+    console.log("Fetching weather for:", city); // ✅ Add this
+
+    const apiKey = '5d28878eec0c443d991154058252205';
+    const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no&alerts=no`);
+    
+    if (!res.ok) throw new Error("Network response was not ok");
 
     const data = await res.json();
-    
+    console.log("Fetched data:", data); // ✅ Add this
+
+
     // Update current weather
     document.querySelector('.location-text').textContent = `Results for ${data.location.name}, ${data.location.region}`;
     document.querySelector('.weather-main').textContent = data.current.condition.text;
@@ -491,7 +494,7 @@ document.getElementById('searchIcon').addEventListener('click', function() {
     document.querySelector('.wind').textContent = `${data.current.wind_kph} Km/H`;
     document.querySelector('.precipitation').textContent = `${data.current.precip_mm} mm`;
 
-    // Quote
+    // Update quote
     updateQuote(data.current.condition.text);
 
     // Update forecast
@@ -516,7 +519,6 @@ document.getElementById('searchIcon').addEventListener('click', function() {
     hourlyData.humidity = hourly.map(h => h.humidity);
     hourlyData.wind = hourly.map(h => h.wind_kph);
 
-    // Update chart
     weatherChart.data.datasets[0].data = hourlyData[currentGraph];
     weatherChart.update();
 
@@ -525,10 +527,11 @@ document.getElementById('searchIcon').addEventListener('click', function() {
       `https://maps.google.com/maps?q=${data.location.name}%20${data.location.country}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
 
   } catch (err) {
-    alert('Failed to fetch weather data. Please check the city name.');
+    alert(`Failed to fetch weather data. Please check the city name: ${city}`);
     console.error(err);
   }
 }
+
 fetchWeather(city);
 
   </script>
