@@ -19,6 +19,7 @@
       font-family: 'Inter', Arial, sans-serif;
       padding: 1rem;
     }
+    
     h1 {
       font-family: 'Geist', sans-serif;
       font-size: 3rem;
@@ -108,112 +109,160 @@
 <body>
   <div class="container">
     <h1>Your Location?</h1>
+    <div id="errorMessage" style="
+  color: #f55;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: none;
+  text-align: center;
+"></div>
+
     <div class="search-wrapper">
       <img src="assets/search.svg" alt="Search" class="search-icon">
       <input type="text" placeholder="Search..." class="search-input" autocomplete="off" id="searchInput">
       <img src="assets/Icon.svg" alt="Voice" class="mic-icon" id="voiceSearch">
-      <div class="suggestions" id="suggestionsList"></div>
+      <ul class="suggestions" id="suggestionsList"></ul>
     </div>
   </div>
   
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('searchInput');
-      const suggestionsContainer = document.getElementById('suggestionsContainer');
-      const voiceBtn = document.getElementById('voiceSearch');
-    
-      // Example data – replace with your real list
-      const allLocations = [
-        'New York', 'London', 'Paris', 'Tokyo',
-        'Sydney', 'Berlin', 'Toronto', 'Mumbai',
-        'Lagos', 'Abia'
-      ];
-    
-      // Redirect helper
-      function goToResults(query) {
-        const q = encodeURIComponent(query.trim());
-        if (!q) return;
-        window.location.href = `weather.html?loc=${q}`;
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsContainer = document.getElementById('suggestionsList');
+    const voiceBtn = document.getElementById('voiceSearch');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Static location list - can be expanded
+    const allLocations = [
+      'New York', 'London', 'Paris', 'Tokyo',
+      'Sydney', 'Berlin', 'Toronto', 'Mumbai',
+      'Lagos', 'Abia', 'Abuja'
+    ];
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.style.display = 'block';
+    }
+
+    function hideError() {
+      errorMessage.textContent = '';
+      errorMessage.style.display = 'none';
+    }
+
+    function isValidLocation(input) {
+      return allLocations.some(
+        loc => loc.toLowerCase() === input.toLowerCase()
+      );
+    }
+
+    // Redirect helper with validation
+    function validateAndGoToResults(query) {
+      const q = query.trim();
+      if (!q) {
+        showError('Please enter a location.');
+        return false;
       }
-    
-      // Render suggestion list
-      function showSuggestions(list) {
+
+      if (!isValidLocation(q)) {
+        showError(`"${q}" is not a known location. Please try again.`);
+        return false;
+      }
+
+      hideError();
+      const encoded = encodeURIComponent(q);
+      window.location.href = `weather.html?loc=${encoded}`;
+      return true;
+    }
+
+    // Show suggestion list only if filtered list is non-empty
+    function showSuggestions(list) {
+      if (list.length === 0) {
+        suggestionsContainer.style.display = 'none';
         suggestionsContainer.innerHTML = '';
-        list.forEach(text => {
-          const li = document.createElement('li');
-          li.textContent = text;
-          li.classList.add('suggestion-item');
-          // use mousedown to beat blur()
-          li.addEventListener('mousedown', () => {
-            goToResults(text);
-          });
-          suggestionsContainer.appendChild(li);
-        });
+        return;
       }
-    
-      // Filter as you type
-      searchInput.addEventListener('input', () => {
-        const val = searchInput.value.trim().toLowerCase();
-        if (!val) {
-          suggestionsContainer.innerHTML = '';
-          return;
-        }
-        const filtered = allLocations.filter(loc =>
-          loc.toLowerCase().startsWith(val)
-        );
-        showSuggestions(filtered);
+      suggestionsContainer.innerHTML = '';
+      list.forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        li.classList.add('suggestion-item');
+        // Use mousedown to avoid blur issues
+        li.addEventListener('mousedown', () => {
+          validateAndGoToResults(text);
+        });
+        suggestionsContainer.appendChild(li);
       });
-    
-      // Clear suggestions shortly after blur
-      searchInput.addEventListener('blur', () => {
-        setTimeout(() => { suggestionsContainer.innerHTML = ''; }, 100);
-      });
-    
-      // Handle Enter key press
-      searchInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          goToResults(searchInput.value);
-        }
-      });
-    
-      // Voice recognition setup
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-    
-        voiceBtn.addEventListener('click', () => {
-          recognition.start();
-          voiceBtn.classList.add('listening');
-        });
-    
-        recognition.addEventListener('result', e => {
-          const transcript = e.results[0][0].transcript;
-          searchInput.value = transcript;
-          // trigger suggestion/filter and redirect
-          const ev = new Event('input', { bubbles: true });
-          searchInput.dispatchEvent(ev);
-          goToResults(transcript);
-        });
-    
-        recognition.addEventListener('end', () => {
-          voiceBtn.classList.remove('listening');
-        });
-    
-        recognition.addEventListener('error', err => {
-          console.error('Speech recognition error:', err.error);
-          voiceBtn.classList.remove('listening');
-        });
-      } else {
-        console.warn('Speech Recognition API not supported.');
-        voiceBtn.style.opacity = 0.5;
+      suggestionsContainer.style.display = 'block';
+    }
+
+    // Filter suggestions as user types
+    searchInput.addEventListener('input', () => {
+      const val = searchInput.value.trim().toLowerCase();
+      hideError();  // Clear error when typing new input
+      if (!val) {
+        suggestionsContainer.style.display = 'none';
+        suggestionsContainer.innerHTML = '';
+        return;
+      }
+      const filtered = allLocations.filter(loc =>
+        loc.toLowerCase().startsWith(val)
+      );
+      showSuggestions(filtered);
+    });
+
+    // Clear suggestions shortly after blur
+    searchInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        suggestionsContainer.style.display = 'none';
+        suggestionsContainer.innerHTML = '';
+      }, 150);
+    });
+
+    // Enter key triggers search redirect with validation
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        validateAndGoToResults(searchInput.value);
       }
     });
-    </script>
-    
-    
+
+    // Voice recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      voiceBtn.addEventListener('click', () => {
+        recognition.start();
+        voiceBtn.classList.add('listening');
+      });
+
+      recognition.addEventListener('result', e => {
+        const transcript = e.results[0][0].transcript;
+        searchInput.value = transcript;
+        const ev = new Event('input', { bubbles: true });
+        searchInput.dispatchEvent(ev);
+        validateAndGoToResults(transcript);
+      });
+
+      recognition.addEventListener('end', () => {
+        voiceBtn.classList.remove('listening');
+      });
+
+      recognition.addEventListener('error', err => {
+        console.error('Speech recognition error:', err.error);
+        voiceBtn.classList.remove('listening');
+      });
+    } else {
+      console.warn('Speech Recognition API not supported.');
+      voiceBtn.style.opacity = 0.5;
+    }
+  });
+</script>
+
 </body>
 </html>
