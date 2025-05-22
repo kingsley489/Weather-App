@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Learny Weather • Results</title>
   
-  <!-- fonts & your gradient text example -->
+  <!-- fonts & gradient text -->
   <link 
     href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" 
     rel="stylesheet"
   />
-  
   <style>
     :root {
       --bg: #121217;
@@ -40,47 +39,41 @@
       padding: 1rem;
       margin: auto;
     }
-  /* Add to your existing styles */
-.search-bar {
-  width: 100%;
-  padding: 1rem 0;
-  display: flex;
-  justify-content: center;
-}
-
-.search-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;       /* or whatever max you prefer */
-  background: #1e1f27;
-  border-radius: 999px;
-  padding: 0.5rem 1rem;
-}
-
-.search-container img {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  opacity: 0.8;
-  flex-shrink: 0;
-}
-
-.search-container img:hover {
-  opacity: 1;
-}
-
-.search-container input {
-  flex: 1;
-  margin: 0 0.5rem;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-}
-
+    .search-bar {
+      width: 100%;
+      padding: 1rem 0;
+      display: flex;
+      justify-content: center;
+    }
+    .search-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      background: #1e1f27;
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+    }
+    .search-container img {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+    .search-container img:hover {
+      opacity: 1;
+    }
+    .search-container input {
+      flex: 1;
+      margin: 0 0.5rem;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+    }
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -130,16 +123,33 @@
       margin: 0.3rem 0;
     }
     .sparkline {
-      /* hook your chart here */
-      height: 100px;
-      background: linear-gradient(to right, #444, #222);
+      height: 250px;
+      background: var(--card-bg);
       border-radius: 8px;
+      padding: 1rem;
       position: relative;
     }
-    .sparkline span {
-      position: absolute; top: 0.5rem; left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.9rem;
+    .graph-buttons {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .graph-buttons button {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--muted);
+      padding: 0.5rem 1rem;
+      margin: 0 0.25rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .graph-buttons button.active,
+    .graph-buttons button:hover {
+      background: var(--muted);
+      color: var(--bg);
+      border-color: var(--muted);
     }
     .forecast {
       display: flex; gap: 0.5rem; overflow-x: auto;
@@ -164,6 +174,11 @@
       border-radius: 8px;
       overflow: hidden;
     }
+    .sparkline canvas {
+  width: 100% !important;
+  height: 250px !important;
+}
+
     @media (max-width: 600px) {
       .current-content h1 { font-size: 2rem; }
       .stats-card .temp { font-size: 2rem; }
@@ -177,18 +192,13 @@
    <!-- Weather Page Search Bar -->
 <div class="search-bar">
     <div class="search-container">
-      <!-- left “search” icon -->
       <img src="assets/search.svg" alt="Search" id="searchIcon" />
-  
-      <!-- text input -->
       <input
         type="text"
         id="searchInput"
         placeholder="Search again..."
         autocomplete="off"
       />
-  
-      <!-- right “voice” icon -->
       <img src="assets/Icon.svg" alt="Voice Search" id="voiceSearch" />
     </div>
   </div>
@@ -199,10 +209,10 @@
       <div class="card current-card">
         <img src="assets/img.png" alt="weather-bg"/>
         <div class="current-content">
-          <small>Results for Lagos 101245, Lagos</small>
-          <h1 class="gradient-text">14:00 PM</h1>
-          <small>Tuesday, July 11 2025</small>
-          <p style="margin-top:1rem; font-size:0.8rem; color:#ccc;">
+          <small class="location-text">Results for Lagos 101245, Lagos</small>
+          <h1 class="gradient-text time-text">14:00 PM</h1>
+          <small class="date-text">Tuesday, July 11 2025</small>
+          <p class="quote-text" style="margin-top:1rem; font-size:0.8rem; color:#ccc;">
             The sky’s feeling a little bit of both today.
           </p>
         </div>
@@ -210,27 +220,33 @@
 
       <div class="card stats-card">
         <div class="temp">32° C</div>
-        <div>Mostly Cloudy</div>
+        <div class="weather-main">Mostly Cloudy</div>
         <ul class="stats-list">
-          <li><span>Precipitation</span><span>0%</span></li>
-          <li><span>Humidity</span><span>68%</span></li>
-          <li><span>Wind</span><span>13 Km/H</span></li>
+          <li><span>Precipitation</span><span class="precipitation">0%</span></li>
+          <li><span>Humidity</span><span class="humidity">68%</span></li>
+          <li><span>Wind</span><span class="wind">13 Km/H</span></li>
         </ul>
       </div>
     </div>
 
     <!-- Sparkline / chart placeholder -->
     <div class="card">
+      <div class="graph-buttons">
+        <button data-graph="temp" class="active">Temperature</button>
+        <button data-graph="humidity">Humidity</button>
+        <button data-graph="wind">Wind</button>
+      </div>
       <div class="sparkline">
-        <!-- you can inject a chart here -->
-        <!-- <span>32  32  32  32  32</span> -->
+        <!-- Remove width and height here -->
+      <canvas id="weatherChart"></canvas>
+
+
       </div>
     </div>
 
     <!-- 7-day forecast -->
     <h2 style="margin-bottom:0.5rem; color:var(--muted)">Forecast</h2>
     <div class="forecast">
-      <!-- repeat .day for each day -->
       <div class="day">
         <h3>Sun</h3>
         <img src="assets/sun-clouds.svg" alt="cloudy"/>
@@ -239,52 +255,282 @@
       </div>
       <div class="day">
         <h3>Mon</h3>
-        <img src="assets/sun-clouds.svg" alt="cloudy"/>
-        <div>32°<sup>C</sup></div>
-        <div style="opacity:0.6;">26°<sup>C</sup></div>
+        <img src="assets/sun-clouds-rain.png" alt="rainy"/>
+        <div>31°<sup>C</sup></div>
+        <div style="opacity:0.6;">22°<sup>C</sup></div>
       </div>
       <div class="day">
         <h3>Tue</h3>
-        <img src="assets/sun-clouds.svg" alt="cloudy"/>
+        <img src="assets/sun.png" alt="sunny"/>
         <div>32°<sup>C</sup></div>
-        <div style="opacity:0.6;">26°<sup>C</sup></div>
+        <div style="opacity:0.6;">24°<sup>C</sup></div>
       </div>
       <div class="day">
         <h3>Wed</h3>
         <img src="assets/sun-clouds.svg" alt="cloudy"/>
-        <div>32°<sup>C</sup></div>
-        <div style="opacity:0.6;">26°<sup>C</sup></div>
+        <div>33°<sup>C</sup></div>
+        <div style="opacity:0.6;">25°<sup>C</sup></div>
       </div>
       <div class="day">
         <h3>Thu</h3>
-        <img src="assets/sun-clouds.svg" alt="cloudy"/>
-        <div>32°<sup>C</sup></div>
+        <img src="assets/thunder.png" alt="thunder"/>
+        <div>33°<sup>C</sup></div>
         <div style="opacity:0.6;">26°<sup>C</sup></div>
       </div>
       <div class="day">
         <h3>Fri</h3>
-        <img src="assets/sun-clouds.svg" alt="cloudy"/>
-        <div>32°<sup>C</sup></div>
-        <div style="opacity:0.6;">26°<sup>C</sup></div>
+        <img src="assets/sun.png" alt="sunny"/>
+        <div>34°<sup>C</sup></div>
+        <div style="opacity:0.6;">27°<sup>C</sup></div>
       </div>
       <div class="day">
         <h3>Sat</h3>
-        <img src="assets/sun-clouds.svg" alt="cloudy"/>
-        <div>32°<sup>C</sup></div>
-        <div style="opacity:0.6;">26°<sup>C</sup></div>
+        <img src="assets/clouds.png" alt="cloudy"/>
+        <div>34°<sup>C</sup></div>
+        <div style="opacity:0.6;">27°<sup>C</sup></div>
       </div>
-      <!-- … Tue, Wed, Thu, Fri similarly -->
     </div>
 
-    <!-- Map embed -->
-    <h2 style="margin-top:2rem; margin-bottom:0.5rem; color:var(--muted)">Map</h2>
+    <!-- Map -->
     <div class="map-container">
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!…"
-        width="100%" height="100%" style="border:0;"
-        allowfullscreen="" loading="lazy">
-      </iframe>
+        src="https://maps.google.com/maps?q=Lagos%20Nigeria&t=&z=13&ie=UTF8&iwloc=&output=embed"
+        frameborder="0"
+        style="border:0;"
+        allowfullscreen=""
+        aria-hidden="false"
+        tabindex="0"
+        width="100%"
+        height="100%"
+      ></iframe>
     </div>
   </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+const city = urlParams.get('city') || 'Lagos';
+
+
+document.getElementById('searchInput').value = city;
+
+    document.getElementById('searchInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const newCity = e.target.value.trim();
+    if (newCity) {
+      window.location.href = `weather.html?city=${encodeURIComponent(newCity)}`;
+    }
+  }
+});
+
+document.getElementById('searchIcon').addEventListener('click', function() {
+  const newCity = document.getElementById('searchInput').value.trim();
+  if (newCity) {
+    window.location.href = `weather.html?city=${encodeURIComponent(newCity)}`;
+  }
+});
+
+    // Time update every minute
+    function updateTime() {
+      const timeEl = document.querySelector('.time-text');
+      const dateEl = document.querySelector('.date-text');
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      timeEl.textContent = `${hours}:${minutes} ${ampm}`;
+
+      // Format date like Tuesday, July 11 2025
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      dateEl.textContent = now.toLocaleDateString(undefined, options);
+    }
+
+    setInterval(updateTime, 60000);
+    updateTime();
+    
+    // Quotes based on weather condition
+    const quotes = {
+      Clear: "The sky's clear and bright — perfect day ahead!",
+      Clouds: "The sky’s feeling a little bit of both today.",
+      Rain: "Don’t forget your umbrella — it's rainy out there.",
+      Thunderstorm: "Stormy skies — stay safe indoors!",
+      Snow: "Snowflakes falling, a winter wonderland.",
+      Mist: "A misty morning adds mystery to the day.",
+      Drizzle: "Light rain is just a gentle reminder to slow down.",
+      Smoke: "The air feels heavy — take care.",
+      Haze: "A hazy day with soft sunlight.",
+      Dust: "Dusty winds blowing, keep your windows closed.",
+      Fog: "Foggy conditions ahead, drive carefully."
+    };
+
+    // Function to update quote based on weather condition
+    function updateQuote(condition) {
+      const quoteEl = document.querySelector('.quote-text');
+      quoteEl.textContent = quotes[condition] || "Weather's a bit unpredictable today!";
+    }
+
+    // Dummy weather data for the graphs, replace with actual API data
+    // We'll create arrays of hourly temperature, humidity, wind speed for 24 hours
+    // For demo, random or static values
+
+    const hourlyData = {
+      temp: Array.from({length: 24}, (_, i) => 20 + Math.sin(i/3)*5 + Math.random()*2),
+      humidity: Array.from({length: 24}, () => 50 + Math.random()*40),
+      wind: Array.from({length: 24}, () => 5 + Math.random()*15)
+    };
+
+    // Chart.js setup
+    const ctx = document.getElementById('weatherChart').getContext('2d');
+    let currentGraph = 'temp';
+
+    const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+
+    let weatherChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: hourlyData.temp,
+          borderColor: '#7be265',
+          backgroundColor: 'rgba(123, 226, 101, 0.3)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 2,
+          borderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            grid: { color: '#333' },
+            ticks: { color: '#ccc' }
+          },
+          x: {
+            grid: { color: '#333' },
+            ticks: { color: '#ccc' }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: { color: '#ccc' }
+          }
+        }
+      }
+    });
+
+    // Switch graph data on button click
+    document.querySelectorAll('.graph-buttons button').forEach(button => {
+      button.addEventListener('click', () => {
+        const graphType = button.getAttribute('data-graph');
+        if (graphType === currentGraph) return;
+
+        // Update active button style
+        document.querySelectorAll('.graph-buttons button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Update chart data
+        currentGraph = graphType;
+        let newData, newLabel, newColor;
+
+        switch(graphType) {
+          case 'temp':
+            newData = hourlyData.temp;
+            newLabel = 'Temperature (°C)';
+            newColor = '#7be265';
+            break;
+          case 'humidity':
+            newData = hourlyData.humidity;
+            newLabel = 'Humidity (%)';
+            newColor = '#42a5f5';
+            break;
+          case 'wind':
+            newData = hourlyData.wind;
+            newLabel = 'Wind Speed (Km/H)';
+            newColor = '#ffa726';
+            break;
+        }
+
+        weatherChart.data.datasets[0].data = newData;
+        weatherChart.data.datasets[0].label = newLabel;
+        weatherChart.data.datasets[0].borderColor = newColor;
+        weatherChart.data.datasets[0].backgroundColor = newColor.replace(/[^,]+(?=\))/, '0.3'); // Set alpha 0.3
+        weatherChart.update();
+      });
+    });
+
+    // Example to update the weather quote when loading or on API call
+    // Replace 'Clouds' below with actual condition fetched from your API
+    updateQuote('Clouds');
+
+    async function fetchWeather(city) {
+  try {
+    const apiKey = '5d28878eec0c443d991154058252205'; // Replace with your WeatherAPI key
+    const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=YOUR_API_KEY&q=${city}&days=7&aqi=no&alerts=no`)
+  .then(res => res.json())
+  .then(data => {
+    // Use data.location, data.current, data.forecast, etc. to update the UI
+  });
+
+    const data = await res.json();
+    
+    // Update current weather
+    document.querySelector('.location-text').textContent = `Results for ${data.location.name}, ${data.location.region}`;
+    document.querySelector('.weather-main').textContent = data.current.condition.text;
+    document.querySelector('.temp').textContent = `${data.current.temp_c}° C`;
+    document.querySelector('.humidity').textContent = `${data.current.humidity}%`;
+    document.querySelector('.wind').textContent = `${data.current.wind_kph} Km/H`;
+    document.querySelector('.precipitation').textContent = `${data.current.precip_mm} mm`;
+
+    // Quote
+    updateQuote(data.current.condition.text);
+
+    // Update forecast
+    const forecastContainer = document.querySelector('.forecast');
+    forecastContainer.innerHTML = '';
+    data.forecast.forecastday.forEach(day => {
+      const date = new Date(day.date);
+      const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+      forecastContainer.innerHTML += `
+        <div class="day">
+          <h3>${weekday}</h3>
+          <img src="https:${day.day.condition.icon}" alt="${day.day.condition.text}" />
+          <div>${Math.round(day.day.maxtemp_c)}°<sup>C</sup></div>
+          <div style="opacity:0.6;">${Math.round(day.day.mintemp_c)}°<sup>C</sup></div>
+        </div>`;
+    });
+
+    // Update chart data
+    const hourly = data.forecast.forecastday[0].hour;
+    hourlyData.temp = hourly.map(h => h.temp_c);
+    hourlyData.humidity = hourly.map(h => h.humidity);
+    hourlyData.wind = hourly.map(h => h.wind_kph);
+
+    // Update chart
+    weatherChart.data.datasets[0].data = hourlyData[currentGraph];
+    weatherChart.update();
+
+    // Update map
+    document.querySelector('.map-container iframe').src =
+      `https://maps.google.com/maps?q=${data.location.name}%20${data.location.country}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+
+  } catch (err) {
+    alert('Failed to fetch weather data. Please check the city name.');
+    console.error(err);
+  }
+}
+fetchWeather(city);
+
+  </script>
 </body>
 </html>
